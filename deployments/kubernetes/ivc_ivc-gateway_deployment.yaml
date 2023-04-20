@@ -52,6 +52,8 @@ spec:
           value: "en_US.UTF-8"
         - name: TZ
           value: "Asia/Shanghai"
+        - name: SYNAPSOR_INSTANCE_ID
+          value: "synapsor"
         command: ["/bin/sh", "-c"]
         args:
           - "echo \"export SYNAPSOR_INSTANCE_ID=$(head -1 /proc/self/cgroup|cut -d/ -f3)\" >> /root/.bashrc;
