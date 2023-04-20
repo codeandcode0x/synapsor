@@ -1,0 +1,58 @@
+version: '3.4'
+services:
+  synapsor:
+    container_name: synapsor
+    image: registry01.wezhuiyi.com/internal-share/synapsor:v1.0.0
+    labels:
+      - zhuiyi.app=synapsor
+    ports:
+      - 30680:30680
+      - 30681:30681
+      - 30682:30682
+      - 30683:30683
+      - 30684:30684
+      - 9850:9850
+    environment:
+      - LANG=en_US.UTF-8
+      - TZ=Asia/Shanghai
+      - SYNAPSOR_INSTANCE_ID=synapsor
+    command: >
+      bash -c "echo \"export SYNAPSOR_INSTANCE_ID=`head -1 /proc/self/cgroup|cut -d/ -f3`\" >> /root/.bashrc
+      && source /root/.bashrc
+      && /data/app/synapsor/bin/server "
+    networks:
+      - default
+    volumes: 
+      - /data/app/synapsor/logs/:/data/app/synapsor/logs/
+      - ./config/:/data/app/synapsor/config/
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4Gi
+        reservations:
+          cpus: '2'
+          memory: 4Gi
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        # delay: 5s
+        max_attempts: 3
+      update_config:
+        parallelism: 1
+        # delay: 10s
+    healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:9800/engine/metricsdata || exit 1"]
+        interval: 5s
+        timeout: 3s
+        retries: 3
+        start_period: 40s
+
+networks:
+  default:
+    external: 
+      name: ivc-net

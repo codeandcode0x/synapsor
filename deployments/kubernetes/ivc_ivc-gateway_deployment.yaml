@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    dependOn: synapsor
+  name: synapsor
+  labels:
+    app.kubernetes.io/code-repo: internal-share_synapsor
+    app.kubernetes.io/name: internal-share_synapsor
+    app.kubernetes.io/part-of: internal-share
+    app: synapsor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: synapsor
+      app.kubernetes.io/code-repo: internal-share_synapsor
+      app.kubernetes.io/name: internal-share_synapsor
+      app.kubernetes.io/part-of: internal-share
+  template:
+    metadata:
+      labels:
+        app: synapsor
+        app.kubernetes.io/code-repo: internal-share_synapsor
+        app.kubernetes.io/name: internal-share_synapsor
+        app.kubernetes.io/part-of: internal-share
+    spec:
+      imagePullSecrets:
+        - name: registry-secrets
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: zhuiyi.ai/synapsor
+                operator: In
+                values:
+                - granted
+      containers:
+      - name: synapsor
+        image: {{ REGISTRY_ADDR | default('') }}internal-share/synapsor:$synapsor_IMAGE_TAG
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 30680
+        - containerPort: 30681
+        - containerPort: 30682
+        - containerPort: 30683
+        - containerPort: 30684
+        - containerPort: 9850
+        env:
+        - name: LANG
+          value: "en_US.UTF-8"
+        - name: TZ
+          value: "Asia/Shanghai"
+        command: ["/bin/sh", "-c"]
+        args:
+          - "echo \"export SYNAPSOR_INSTANCE_ID=$(head -1 /proc/self/cgroup|cut -d/ -f3)\" >> /root/.bashrc;
+            source /root/.bashrc;
+            /data/app/synapsor/bin/server;
+            "
+        volumeMounts:
+        - mountPath: /data/app/synapsor/config
+          name: synapsor-config
+        - name: logs-data
+          mountPath: /data/app/synapsor/logs/
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          httpGet:  # http请求
+            path: /engine/metricsdata
+            port: {{ env['synapsor-port'] | default(9850) }}
+          timeoutSeconds: 3
+          failureThreshold: 30
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          tcpSocket:
+            port: 9800
+          timeoutSeconds: 3
+          failureThreshold: 30
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+            # ephemeral-storage: "10Gi"
+          requests:
+            cpu: "4"
+            memory: 4Gi
+      enableServiceLinks: false
+      volumes:
+      - name: logs-data
+        hostPath:
+          path: /data/app/synapsor
+          type: DirectoryOrCreate
+      - configMap:
+          name: synapsor-config
+        name: synapsor-config
+...

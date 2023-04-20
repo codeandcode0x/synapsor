@@ -1,0 +1,25 @@
+# runtime setting
+# default run mode
+RUN_MODE: 'dev'
+# http server debug mode (debug、release、test)
+HTTP_DEBUG_MODE: 'debug'
+# HTTP Req Timeout
+HTTP_TIME_DURATION: 10
+# page size
+PAGE_SIZE: 20
+# server port
+HTTP_SERVER_PORT: '9800'
+# gRPC port
+GRPC_PORT: '8800'
+# runtime cpu num
+RUNTIME_CPU_NUM: 4
+# log setting
+# log Level （info、debug、error）
+LOG_LEVEL: 'info'
+# log max age (minutes, default 30 days)
+LOG_MAX_AGE: 43200
+# log rotation time (minutes, default 1 days)
+LOG_ROTATION_TIME: 1140
+
+
+

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ env['synapsor-svc'] | default('synapsor') }}"
+  annotations:
+    traefik.ingress.kubernetes.io/service.serversscheme: h2c
+  labels:
+    app: synapsor
+    app.kubernetes.io/code-repo: internal-share_synapsor
+    app.kubernetes.io/name: internal-share_synapsor
+    app.kubernetes.io/part-of: ivc
+spec:
+  ports:
+  - name: "grpc-30680"
+    port: {{ env['synapsor-grpc1-port'] | default(30680) }}
+    targetPort: {{ env['synapsor-grpc1-port'] | default(30680) }}
+  - name: "grpc-30681"
+    port: {{ env['synapsor-grpc2-port'] | default(30681) }}
+    targetPort: {{ env['synapsor-grpc2-port'] | default(30681) }}
+  - name: "grpc-30682"
+    port: {{ env['synapsor-grpc3-port'] | default(30682) }}
+    targetPort: {{ env['synapsor-grpc3-port'] | default(30682) }}
+  - name: "grpc-30683"
+    port: {{ env['synapsor-grpc4-port'] | default(30683) }}
+    targetPort: {{ env['synapsor-grpc4-port'] | default(30683) }}
+  - name: "http-9850"
+    port: {{ env['synapsor-port'] | default(9850) }}
+    targetPort: {{ env['synapsor-port'] | default(9850) }}
+  selector:
+    app: synapsor
+  type: ClusterIP
+status:
+  loadBalancer: {}

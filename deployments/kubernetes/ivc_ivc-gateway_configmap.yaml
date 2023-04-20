@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: synapsor-config
+data:
+  ProxyConfig.yaml: |-
+    proxy:
+      setting:
+        LISTEN_PROXY_ADDR: '0.0.0.0'
+      proxy_list: 
+        - PROXY_NAME: 'default'
+          ENABLED: true
+          POOL_ENABLED: true
+          DIAL_TIMEOUT: 5             # second
+          BACKOFF_MAX_DELAY: 3        # second
+          KEEPALIVE_TIME: 5           # second
+          KEEPALIVE_TIMEOUT: 10       # second
+          REQUEST_IDLE_TIME: 10       # second
+          REQUEST_MAX_LIFE: 60        # second
+          REQUEST_TIMEOUT: 3          # second
+          POOL_MODEL: 1               # default 0 : STRICT_MODE, 1: LOOSE_MODE
+          PROXY_MODEL: 'randomWeight'       # minConn or randomWeight
+          GRPC_REQUEST_REUSABLE: true # 连接是否复用
+          PROXY_LOCAL_ADDR: '0.0.0.0' # proxy 本地监听地址
+          DEFAULT_GRPC_CONN_NUM: 10   # 默认创建的连接数
+          PROXY_PORT: '30680'
+          GRPC_PROXY_ENDPOINTS:       # 负载的 endpoints 列表
+            - 172.18.160.84:30880#10
+            - 172.18.160.84:30880#10
+  
