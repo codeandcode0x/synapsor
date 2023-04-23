@@ -46,7 +46,7 @@ services:
         parallelism: 1
         # delay: 10s
     healthcheck:
-        test: ["CMD-SHELL", "curl -f http://localhost:9800/engine/metricsdata || exit 1"]
+        test: ["CMD-SHELL", "curl -f http://localhost:9850/proxy/metricsdata || exit 1"]
         interval: 5s
         timeout: 3s
         retries: 3

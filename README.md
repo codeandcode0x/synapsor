@@ -62,7 +62,6 @@ proxy:
       POOL_MODEL: 1               # default 0 : STRICT_MODE, 1: LOOSE_MODE
       PROXY_MODEL: 'randomWeight'       # minConn or randomWeight
       GRPC_REQUEST_REUSABLE: true # 连接是否复用
-      PROXY_LOCAL_ADDR: '0.0.0.0' # proxy 本地监听地址
       DEFAULT_GRPC_CONN_NUM: 10   # 默认创建的连接数
       PROXY_PORT: '30880'
       GRPC_PROXY_ENDPOINTS:       # 负载的 endpoints 列表, "#" 号后面是权重
@@ -75,11 +74,11 @@ proxy:
 - KEEPALIVE_TIMEOUT: wait 1 second for ping ack before considering the connection dead
 - REQUEST_TIMEOUT: 请求超时设置
 - GRPC_REQUEST_REUSABLE: 是否复用连接
-- PROXY_LOCAL_ADDR: synapsor 本地监听 ip
+- LISTEN_PROXY_ADDR: synapsor 本地监听 ip
 - DEFAULT_GRPC_CONN_NUM：建立连接的默认连接数 (会自动进行扩增)
 - EXPOSE_PROXY_PORT: synapsor 暴露的端口
 - GRPC_PROXY_ENDPOINTS: 负载的 endpoint 列表
-- PROXY_MODEL: 负载的模式（minConn：最小连接数，适用于流量控制; randomWeight: 加权随机，适用于非流控场景）
+- PROXY_MODEL: 负载的模式（minConn：最小连接数，适用于流量控制，流式连接; randomWeight: 加权随机，适用于非流控场景）
 
 **支持多个端口负载多个 endpoint 列表**
 
@@ -95,5 +94,12 @@ k8s
 kubectl apply -f deployments/kubernetes/
 ```
 
+# FAQ
+Q: received prior goaway: code: ENHANCE_YOUR_CALM, debug data: “too_many_pings”
+
+A:
+grpc client 的keepalive 用来检测 client 创建的grpc channel 连接是不是可用的，如果超时，就会关掉这个channel 的连接 ；
+grpc server 的keepalive 用来检测 server 创建的grpc channel 连接是不是可用的，如果超时，就会关掉这个channel 的连接 ；
+在这里还需要特别注意一个问题， grpc client 的keepalive 的 时间设定 需要在server 允许范围内，否则，server 会发送一个GOAWAY 消息，把和client 的连接强制关掉 。
 
 

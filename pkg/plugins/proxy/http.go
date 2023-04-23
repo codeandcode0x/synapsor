@@ -241,11 +241,9 @@ func definitionRoute(router *gin.Engine) {
 	gin.SetMode(runMode)
 	// middleware
 	router.Use(gin.Recovery())
-	// setting time out duration
-	router.Use(middleware.UseCookieSession())
 	// setting panic recover
 	router.Use(middleware.Recover)
-
+	// setting time out duration
 	var timeOutNum time.Duration
 	timeOutDuration := os.Getenv("HTTP_TIME_DURATION")
 	if timeOutDuration == "" {
@@ -255,17 +253,12 @@ func definitionRoute(router *gin.Engine) {
 		timeOutNum = (time.Duration)(timeOutNumInt64)
 	}
 	router.Use(middleware.TimeoutHandler(time.Second * timeOutNum))
-
 	// metrics data api
 	var metricsController *controller.MetricsController
 	// metrics api
 	router.GET("/proxy/metricsdata", metricsController.GetPoolMetricsData)
 	// no route
 	router.NoRoute(noRouteResponse)
-	// add route fist
-	getRouterTask(router)
-	// watch route
-	watchRouter(router)
 }
 
 // watch router

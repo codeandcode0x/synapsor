@@ -34,22 +34,12 @@ var failedPoolStatus bool = false
 // whether use default proxy
 var defaultProxy bool = false
 
-// pools map
-var asrPools, ttsPools = make(map[string]map[string]*Pool), make(map[string]map[string]*Pool)
-var offlineasrPools, offlinettsPools = make(map[string]map[string]*Pool), make(map[string]map[string]*Pool)
-
-// setting engine share mode env
-var engineShareMode string
-
-//offline asr transcribe method
-var asrEngineGrpcMethod, ttsEngineGrpcMethod, offlineasrOfflineTranscribeMethod, offlineasrOfflineGetResultMethod string
-
 // const
 var (
 	DialTimeout                 = 5 * time.Second
 	BackoffMaxDelay             = 3 * time.Second
-	KeepAliveTime               = time.Duration(5) * time.Second
-	KeepAliveTimeout            = time.Duration(5) * time.Second
+	KeepAliveTime               = time.Duration(3) * time.Second
+	KeepAliveTimeout            = time.Duration(3) * time.Second
 	InitialWindowSize     int32 = 1 << 30
 	InitialConnWindowSize int32 = 1 << 30 // 1073741824
 	MaxSendMsgSize              = 4 << 30 // 4294967296
@@ -211,8 +201,8 @@ func grpcDial(address string) (*grpc.ClientConn, error) {
 		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(MaxSendMsgSize)),
 		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(MaxRecvMsgSize)),
 		grpc.WithKeepaliveParams(keepalive.ClientParameters{
-			Time:                KeepAliveTime,
-			Timeout:             KeepAliveTimeout,
+			Time:                3,
+			Timeout:             3,
 			PermitWithoutStream: true,
 		}),
 	)
@@ -282,20 +272,4 @@ func strEncode(str []byte) []byte {
 //decode (support base64)
 func strDecode(str []byte) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(str))
-}
-
-//get now time second end 00:00
-func GetZoneTimeStatus() bool {
-	var cstSh, _ = time.LoadLocation("Asia/Shanghai") //上海
-	timeTemplate := "2006-01-02 15:04:05"
-	timeStr := time.Now().Format("2006-01-02")
-	nowTimeStr := time.Now().In(cstSh).Format(timeTemplate)
-	todayEndTimeStr := timeStr + " 23:59:59"
-	formatTime, _ := time.Parse(timeTemplate, nowTimeStr)
-	formatTimeTarget, _ := time.Parse(timeTemplate, todayEndTimeStr)
-	sencod := formatTimeTarget.Unix() - formatTime.Unix()
-	if sencod == 0 {
-		return true
-	}
-	return false
 }

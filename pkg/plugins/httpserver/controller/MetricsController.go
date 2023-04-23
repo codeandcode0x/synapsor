@@ -25,6 +25,7 @@ func (uc *MetricsController) getCtl() *MetricsController {
 func (uc *MetricsController) GetPoolMetricsData(c *gin.Context) {
 
 	mDatas, err := uc.getCtl().Service.GetMetricsData()
+
 	// error
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{

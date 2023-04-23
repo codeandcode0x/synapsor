@@ -5,14 +5,8 @@ RUN_MODE: 'dev'
 HTTP_DEBUG_MODE: 'debug'
 # HTTP Req Timeout
 HTTP_TIME_DURATION: 10
-# page size
-PAGE_SIZE: 20
 # server port
-HTTP_SERVER_PORT: '9800'
-# gRPC port
-GRPC_PORT: '8800'
-# runtime cpu num
-RUNTIME_CPU_NUM: 4
+HTTP_SERVER_PORT: '9850'
 # log setting
 # log Level （info、debug、error）
 LOG_LEVEL: 'info'

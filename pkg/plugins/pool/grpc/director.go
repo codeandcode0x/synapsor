@@ -41,8 +41,6 @@ func GrpcProxyTransport(ctx context.Context, fullMethodName string) (context.Con
 	if strings.HasPrefix(fullMethodName, "/ivc.v1.internal") {
 		return nil, nil, nil, status.Errorf(codes.Unimplemented, "invaild or unsupported method")
 	}
-	// setting engine share mode
-	// var engineType, engineCode string
 	var err error
 	var conn *Client
 	// setting md data
@@ -68,21 +66,6 @@ func GrpcProxyTransport(ctx context.Context, fullMethodName string) (context.Con
 	return nil, nil, nil, status.Errorf(codes.Unimplemented, "unknown method")
 }
 
-//get meta token
-func GetMdToken(token string) ([]string, error) {
-	//get md data token: {userid + engineCode + engine type + rand}
-	engineTokenData, errDecode := strDecode([]byte(token))
-	if errDecode != nil {
-		return nil, status.Errorf(codes.Unimplemented, "token decode failed .")
-	}
-	// get engine code
-	engineToken := strings.Split(string(engineTokenData), "-")
-	if len(engineToken) < 3 {
-		return nil, status.Errorf(codes.Unimplemented, "engine token length error")
-	}
-	return engineToken, nil
-}
-
 // gRPC proxy
 func balancePool(pools map[string]*Pool, proxyModel string) *Pool {
 	// var sumSize, size int
@@ -91,25 +74,18 @@ func balancePool(pools map[string]*Pool, proxyModel string) *Pool {
 		return nil
 	}
 
-	if len(pools) == 1 {
-		for k, _ := range pools {
-			index = k
-		}
-	} else {
-		switch strings.ToLower(proxyModel) {
-		case "randomweight":
-			index = randomWeightBalance(pools)
-		case "minconn":
-			index = minConnBalance(pools)
-		default:
-			index = randomWeightBalance(pools)
-		}
-		vsDebug := os.Getenv("VS_DEBUG")
-		if vsDebug == "true" {
-			logging.DEBUG.Debug("print debug log grpc balance index: ", index, proxyModel)
-		}
+	switch strings.ToLower(proxyModel) {
+	case "randomweight":
+		index = randomWeightBalance(pools)
+	case "minconn":
+		index = minConnBalance(pools)
+	default:
+		index = randomWeightBalance(pools)
 	}
-
+	vsDebug := os.Getenv("VS_DEBUG")
+	if vsDebug == "true" {
+		logging.DEBUG.Debug("print debug log grpc balance index: ", index, proxyModel)
+	}
 	pools[index].sumRequestTimes += 1
 	return pools[index]
 }
@@ -139,24 +115,6 @@ func minConnBalance(pools map[string]*Pool) string {
 	return index
 }
 
-// random proxy
-func randomConnBalance(pools map[string]*Pool) string {
-	var indexRand []string
-	for k, pool := range pools {
-		if !pool.status {
-			continue
-		}
-		indexRand = append(indexRand, k)
-	}
-	index := rand.Intn(len(indexRand))
-	vsDebug := os.Getenv("VS_DEBUG")
-	if vsDebug == "true" {
-		logging.DEBUG.Debug("print debug log grpc balance index source: ", index, len(indexRand))
-	}
-	// 随机
-	return indexRand[index]
-}
-
 // random with weight proxy
 func weightedRandomIndex(weights []float32) int {
 	if len(weights) == 1 {
@@ -177,6 +135,7 @@ func weightedRandomIndex(weights []float32) int {
 	return len(weights) - 1
 }
 
+// random weight balance
 func randomWeightBalance(pools map[string]*Pool) string {
 	var weights = []float32{}
 	var indexRand []string
