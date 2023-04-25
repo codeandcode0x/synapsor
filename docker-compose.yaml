@@ -2,7 +2,7 @@ version: '3.4'
 services:
   synapsor:
     container_name: synapsor
-    image: synapsor:v1.0.0
+    image: roandocker/synapsor:v1.0.0
     labels:
       - app=synapsor
     ports:

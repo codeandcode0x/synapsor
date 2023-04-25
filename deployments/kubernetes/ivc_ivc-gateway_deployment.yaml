@@ -38,7 +38,7 @@ spec:
                 - granted
       containers:
       - name: synapsor
-        image: synapsor:v1.0.0
+        image: roandocker/synapsor:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 30680
