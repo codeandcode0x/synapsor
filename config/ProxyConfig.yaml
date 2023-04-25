@@ -18,5 +18,5 @@ proxy:
       DEFAULT_GRPC_CONN_NUM: 4   # 默认创建的连接数
       PROXY_PORT: '30680'
       GRPC_PROXY_ENDPOINTS:       # 负载的 endpoints 列表, "#" 号后面是权重
-        - 172.18.160.84:30880#10
+        - 172.18.*.*:30880#10
   

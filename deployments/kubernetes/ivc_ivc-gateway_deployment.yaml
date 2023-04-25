@@ -32,13 +32,13 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: zhuiyi.ai/synapsor
+              - key: synapsor
                 operator: In
                 values:
                 - granted
       containers:
       - name: synapsor
-        image: {{ REGISTRY_ADDR | default('') }}internal-share/synapsor:$synapsor_IMAGE_TAG
+        image: synapsor:v1.0.0
         imagePullPolicy: Always
         ports:
         - containerPort: 30680
@@ -70,7 +70,7 @@ spec:
           periodSeconds: 10
           httpGet:  # http请求
             path: /proxy/metricsdata
-            port: {{ env['synapsor-port'] | default(9850) }}
+            port: 9850
           timeoutSeconds: 3
           failureThreshold: 30
         readinessProbe:

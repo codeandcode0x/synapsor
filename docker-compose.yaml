@@ -2,9 +2,9 @@ version: '3.4'
 services:
   synapsor:
     container_name: synapsor
-    image: registry01.wezhuiyi.com/internal-share/synapsor:v1.0.0
+    image: synapsor:v1.0.0
     labels:
-      - zhuiyi.app=synapsor
+      - app=synapsor
     ports:
       - 30680:30680
       - 30681:30681

@@ -39,9 +39,8 @@ gRPC Proxy 流程图:
 
 ## 均衡策略
 目前支持 gRPC 均衡策略是：
-1. 随机 ；
-2. 加权随机 ；
-3. 最小连接数 ；
+1. 加权随机 ；
+2. 最小连接数 ；
 
 # 配置说明
 ```yaml
@@ -102,4 +101,5 @@ grpc client 的keepalive 用来检测 client 创建的grpc channel 连接是不�
 grpc server 的keepalive 用来检测 server 创建的grpc channel 连接是不是可用的，如果超时，就会关掉这个channel 的连接 ；
 在这里还需要特别注意一个问题， grpc client 的keepalive 的 时间设定 需要在server 允许范围内，否则，server 会发送一个GOAWAY 消息，把和client 的连接强制关掉 。
 
-
+Q: code = Cancelled  desc = Cancelled on the server side
+A: 客户端建立连接后，超过一定时间没有发送数据 (包括 ping 数据) 会被 server 端主动断开连接 ;
